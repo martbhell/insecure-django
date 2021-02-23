@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Hello Licenses!</title>
+    </head>
+
+    <body>
+        <h1>Hello Notes!</h1>
+
+<!--
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    licenseid = models.CharField(max_length=32)
+    mac_address = models.CharField(max_length=18)
+    created_at = models.DateTimeField('creation date', auto_now_add=True)
+    expire_at = models.DateTimeField('expiration date')
+-->
+
+			<table border=1>
+					{% for license in licenses %}
+				<tr>
+					<td>{{ license.licenseid }}</td>
+					<td>{{ license.owner }}</td>
+				</tr>
+    {% endfor %}
+			</table>
+
+
+        <h2>Login</h2>
+		<a href="login">Login</a>
+
+
+        <h2>Add content to list</h2>
+
+    <form action="add" method="POST">
+        {% csrf_token %}
+        <input type="text" name="content" required/>
+        <input type="submit"/>
+    </form>
+
+
+        <h2>Clear everything</h2>
+
+    <form action="erase" method="POST">
+        {% csrf_token %}
+        <input type="submit"/>
+    </form>
+
+
+    </body>
+</html>
