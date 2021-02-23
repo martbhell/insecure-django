@@ -10,6 +10,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     social_security = models.CharField(max_length=13, unique=True)
     num_licenses = models.IntegerField(default=10)
+    admin = models.BooleanField(default=False)
 
 class License(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)

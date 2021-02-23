@@ -14,7 +14,7 @@ def GenerateLicense(MAC):
 
     now = time.time()
 
-    if ":" in MAC:
+    if ":" in MAC or "-" in MAC:
         step1_license = MAC+str(now)
         step2_license = step1_license.replace(":", "").replace(".", "")
         return (step2_license, now)
@@ -27,16 +27,27 @@ def AddLicense(request):
 
     user = request.user
 
+    profile = Profile.objects.get(user=user)
+    user_licenses_left = profile.num_licenses
+
+#    print(user_licenses_left)
+
+    if user_licenses_left <= 0:
+        return HttpResponse("Error: No licenses left")
+
     if request.method == "POST":
         print("POST")
 #        print("existing: %s" % License.objects.get(licenseid="abc"))
         try:
             MAC = request.POST.get('MAC', '')
-            print(MAC)
             license, now = GenerateLicense(MAC)
-            now_1y = now + 86400
+
+            now_1y = now + 31556926
             try:
-                License.objects.create(licenseid=license, owner=user, created_at=datetime.datetime.fromtimestamp(now), expire_at=datetime.datetime.fromtimestamp(now_1y))
+                License.objects.create(licenseid=license, owner=user, created_at=datetime.datetime.fromtimestamp(now), expire_at=datetime.datetime.fromtimestamp(now_1y), mac_address=MAC)
+                profile.num_licenses = profile.num_licenses - 1 
+                profile.save()
+                print("Licenses left: %s" % profile.num_licenses)
                 return HttpResponse("OK: License Added")
             except:
                 print("existing: %s" % License.objects.get(licenseid=license))
@@ -46,8 +57,9 @@ def AddLicense(request):
 def LicensesView(request):
 
     user = request.user
-    licenses = License.objects.filter(owner=user)
-    print(licenses.__dict__)
+    if not user.is_anonymous:
+        licenses = License.objects.filter(owner=user)
+        print(licenses.__dict__)
 
     # user = request.user
     # search through the DB
@@ -85,5 +97,17 @@ def CreateUsers(request):
         alicepro = Profile.objects.create(user=alice, social_security="20010603-1234", num_licenses=2)
     except:
         print("We already have a Profile called %s" % alice)
+
+    try:
+        admin = User.objects.create_user(username='admin', password='nimda')
+    except:
+        admin = User.objects.get(username='admin')
+        print("We already have a user called %s" % admin)
+
+    adminid = User.objects.get(username='admin').id
+    try:
+        adminpro = Profile.objects.create(user=admin, social_security="19666666-1234", num_licenses=99, admin=True)
+    except:
+        print("We already have a Profile called %s" % admin)
 
     return HttpResponse('OK: Users Created')
