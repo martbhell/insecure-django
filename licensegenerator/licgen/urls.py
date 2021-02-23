@@ -9,5 +9,7 @@ urlpatterns = [
     path('createusers', views.CreateUsers, name='createusers'),
     path('login', LoginView.as_view(template_name='login.html')),
     path('logout/', LogoutView.as_view(next_page='/')),
+    path('accounts/profile/', views.LicensesView, name='profile'),
+    path('add', views.AddLicense, name='addlicense'),
 
 ]

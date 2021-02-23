@@ -28,12 +28,14 @@
         <h2>Login</h2>
 		<a href="login">Login</a>
 
+        <h2>Logout</h2>
+		<a href="/logout/">Logout</a>
 
         <h2>Add content to list</h2>
 
-    <form action="add" method="POST">
+    <form action="/add" method="POST">
         {% csrf_token %}
-        <input type="text" name="content" required/>
+        <input type="text" name="MAC" required/>
         <input type="submit"/>
     </form>
 
