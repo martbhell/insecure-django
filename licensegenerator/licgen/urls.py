@@ -11,5 +11,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='/')),
     path('accounts/profile/', views.LicensesView, name='profile'),
     path('add', views.AddLicense, name='addlicense'),
+    path('add_user_licenses', views.AddUserLicenses, name='adduserlicenses'),
+    path('admin/', views.AdminView, name='admin'),
 
 ]

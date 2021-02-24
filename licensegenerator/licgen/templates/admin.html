@@ -16,19 +16,11 @@
 
 			<table border=1>
 				<tr>
-					<td><b>licenseid</td>
-					<td><b>owner</td>
-					<td><b>mac_address</td>
-					<td><b>created_at</td>
-					<td><b>expire_at</b></td>
+					<td><b>userlist</b></td>
 				</tr>
-					{% for license in licenses %}
+					{% for u in users %}
 				<tr>
-					<td>{{ license.licenseid }}</td>
-					<td>{{ license.owner }}</td>
-					<td>{{ license.mac_address }}</td>
-					<td>{{ license.created_at }}</td>
-					<td>{{ license.expire_at }}</td>
+					<td>{{ u }}</td>
 				</tr>
     {% endfor %}
 			</table>
@@ -43,22 +35,19 @@
         <h2>Create Users</h2>
 		<a href="/createusers">CreateUsers</a>
 
-        <h2>Add content to list</h2>
+        <h2>Add more licenses to user</h2>
 
-    <form action="/add" method="POST">
+    <form action="/add_user_licenses" method="POST">
         {% csrf_token %}
-        <input type="text" name="MAC" required/>
+        <input type="number" name="more_licenses" min="1" max="9" required/>
+		<label for="chosen_user" name="chosen_user" required/>
+			<select id="chosen_user" name="chosen_user">
+				{% for u in users %}
+				<option value="{{ u }}">{{ u }}</option>
+				{% endfor %}
+			</select>
         <input type="submit"/>
     </form>
-
-
-        <h2>Add more licenses</h2>
-
-    <form action="erase" method="POST">
-        {% csrf_token %}
-        <input type="submit"/>
-    </form>
-
 
     </body>
 </html>

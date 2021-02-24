@@ -10,6 +10,14 @@ import datetime
 def index(request):
     return render(request, 'index.html', {'licenses': [ { "licenseid": "123ABC", "owner": "bob", "created_at": "2021-12-13", "expired_at": "2022-12-13"} ] } )
 
+def AdminView(request):
+    # send a long a list of users
+    users = User.objects.all()
+    ulist = []
+    for user in users:
+        ulist.append(user)
+    return render(request, 'admin.html', {'users': ulist } )
+
 def GenerateLicense(MAC):
 
     now = time.time()
@@ -57,16 +65,21 @@ def AddLicense(request):
 def LicensesView(request):
 
     user = request.user
+    data = []
     if not user.is_anonymous:
         licenses = License.objects.filter(owner=user)
-        print(licenses.__dict__)
+        #print(licenses.__dict__)
+        #print(licenses)
+        for l in licenses:
+#            print(l.licenseid)
+            licenseid = l.licenseid
+            owner = l.owner
+            created_at = l.created_at
+            expire_at = l.expire_at
+            mac_address = l.mac_address
+            data.append({"licenseid": licenseid, "owner": owner, "created_at": created_at, "expire_at": expire_at, "mac_address": mac_address })
 
-    # user = request.user
-    # search through the DB
-    # make a dict with list of dicts
-    # make it in JSON
-
-    return render(request, 'index.html', {'licenses': [ { "licenseid": "123ABC", "owner": "bob", "created_at": "2021-12-13", "expired_at": "2022-12-13"} ] } )
+    return render(request, 'index.html', {'licenses': data})
 
 def CreateUsers(request):
 #    print(User.objects.get(username='bob').__dict__)
@@ -111,3 +124,18 @@ def CreateUsers(request):
         print("We already have a Profile called %s" % admin)
 
     return HttpResponse('OK: Users Created')
+
+def AddUserLicenses(request):
+
+    # TODO improve security
+    # if profile.admin
+
+    if request.method == "POST":
+        more_licenses = request.POST.get('more_licenses', '0')
+        chosen_user = request.POST.get('chosen_user', '')
+        user = User.objects.get(username=chosen_user)
+        profile = Profile.objects.get(user=user)
+        user_licenses = profile.num_licenses
+        profile.num_licenses = int(profile.num_licenses) + int(more_licenses)
+        profile.save()
+        return HttpResponse("OK: %s for %s that has %s" % (more_licenses, chosen_user, user_licenses))
