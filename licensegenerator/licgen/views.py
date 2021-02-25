@@ -1,14 +1,50 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse,JsonResponse
 from django.contrib.auth.models import User
 from .models import Profile, License
 import time
 import datetime
+import json
 
 # Create your views here.
 
 def index(request):
     return render(request, 'index.html', {'licenses': [ { "licenseid": "123ABC", "owner": "bob", "created_at": "2021-12-13", "expired_at": "2022-12-13"} ] } )
+
+def AllAccountsView(request):
+    # Return a handy list of profiles for automating system administration
+    users = User.objects.all()
+    profiles = Profile.objects.all()
+    ulist = []
+    plist = []
+    for user in users:
+        ulist.append(user)
+        try:
+            plist.append(Profile.objects.get(user=user.id))
+        except:
+            print("no profile for %s" % user)
+            pass
+
+    data = []
+    for p in plist:
+        ss = p.social_security
+        u = str(p.user)
+        a = p.admin
+        n = p.num_licenses
+        #print(type(ss))
+        #print(type(u))
+        #print(type(a))
+        #print(type(n))
+        data.append({ "social_security": ss, "username": u, "admin": a, "num_licenses": n })
+
+    jsondata = json.dumps(data)
+
+    # TODO: how unsafe is safe=False ?
+    #  https://docs.djangoproject.com/en/3.1/ref/request-response/#jsonresponse-objects
+    #   If it’s set to False, any object can be passed for serialization (otherwise only dict instances are allowed)
+    #  OWASP deserialization ?
+    return JsonResponse(data, safe=False)
+
 
 def AdminView(request):
     # send a long a list of users

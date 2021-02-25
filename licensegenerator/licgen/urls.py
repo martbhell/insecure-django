@@ -13,5 +13,6 @@ urlpatterns = [
     path('add', views.AddLicense, name='addlicense'),
     path('add_user_licenses', views.AddUserLicenses, name='adduserlicenses'),
     path('admin/', views.AdminView, name='admin'),
+    path('admin/api/v1/hidden/allaccountsview/', views.AllAccountsView, name='allaccountsview'),
 
 ]
