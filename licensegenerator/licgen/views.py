@@ -15,6 +15,7 @@ def AllAccountsView(request):
     # Return a handy list of profiles for automating system administration
     users = User.objects.all()
     profiles = Profile.objects.all()
+    pretty = request.GET.get('pretty')
     ulist = []
     plist = []
     for user in users:
@@ -43,6 +44,9 @@ def AllAccountsView(request):
     #  https://docs.djangoproject.com/en/3.1/ref/request-response/#jsonresponse-objects
     #   If it’s set to False, any object can be passed for serialization (otherwise only dict instances are allowed)
     #  OWASP deserialization ?
+
+    if pretty or pretty == "":
+        return JsonResponse(data, safe=False, json_dumps_params={'indent': 2})
     return JsonResponse(data, safe=False)
 
 
@@ -52,6 +56,7 @@ def AdminView(request):
     ulist = []
     for user in users:
         ulist.append(user)
+
     return render(request, 'admin.html', {'users': ulist } )
 
 def GenerateLicense(MAC):
@@ -102,6 +107,9 @@ def LicensesView(request):
 
     user = request.user
     data = []
+    if len(User.objects.all()) == 0:
+        CreateUsers(request)
+
     if not user.is_anonymous:
         licenses = License.objects.filter(owner=user)
         #print(licenses.__dict__)
@@ -143,7 +151,7 @@ def CreateUsers(request):
 
     aliceid = User.objects.get(username='alice').id
     try:
-        alicepro = Profile.objects.create(user=alice, social_security="20010603-1234", num_licenses=2)
+        alicepro = Profile.objects.create(user=alice, social_security="19990103-5555", num_licenses=6)
     except:
         print("We already have a Profile called %s" % alice)
 
