@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse,JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from .models import Profile, License
 import time
 import datetime
@@ -180,10 +181,15 @@ def AddUserLicenses(request):
         more_licenses = request.POST.get('more_licenses', '0')
         chosen_user = request.POST.get('chosen_user', '')
         user = User.objects.get(username=chosen_user)
+        logged_in_user = User.objects.get(username=request.user)
+        logged_in_profile = Profile.objects.get(user=logged_in_user)
         profile = Profile.objects.get(user=user)
-        user_licenses = profile.num_licenses
-        profile.num_licenses = int(profile.num_licenses) + int(more_licenses)
-        profile.save()
-        return HttpResponse("OK: %s for %s that has %s" % (more_licenses, chosen_user, user_licenses))
+        if logged_in_profile.admin:
+            user_licenses = profile.num_licenses
+            profile.num_licenses = int(profile.num_licenses) + int(more_licenses)
+            profile.save()
+            return HttpResponse("OK: %s for %s that has %s" % (more_licenses, chosen_user, user_licenses))
+        else:
+            raise PermissionDenied
     else:
         return redirect('/admin')
