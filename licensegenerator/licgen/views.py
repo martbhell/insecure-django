@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse,JsonResponse
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from .models import Profile, License
 import time
 import datetime
@@ -169,6 +170,7 @@ def CreateUsers(request):
 
     return HttpResponse('OK: Users Created')
 
+@login_required
 def AddUserLicenses(request):
 
     # TODO improve security
@@ -183,3 +185,5 @@ def AddUserLicenses(request):
         profile.num_licenses = int(profile.num_licenses) + int(more_licenses)
         profile.save()
         return HttpResponse("OK: %s for %s that has %s" % (more_licenses, chosen_user, user_licenses))
+    else:
+        return redirect('/admin')
