@@ -7,6 +7,11 @@ from .models import Profile, License
 import time
 import datetime
 import json
+import logging
+import sys
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 # Create your views here.
 
@@ -47,6 +52,10 @@ def AllAccountsView(request):
     #   If it’s set to False, any object can be passed for serialization (otherwise only dict instances are allowed)
     #  OWASP deserialization ?
 
+    msg = { "msg": "user %s accessed the AllAccountsView" % (str(request.user)), "user": str(request.user), "function": "AllAccountsView" }
+
+    logger.warn(__name__ + " JSON= " + str(msg))
+
     if pretty or pretty == "":
         return JsonResponse(data, safe=False, json_dumps_params={'indent': 2})
     return JsonResponse(data, safe=False)
@@ -72,7 +81,6 @@ def GenerateLicense(MAC):
     else:
         print("not a MAC")
         return False
-
 
 def AddLicense(request):
 
@@ -103,6 +111,9 @@ def AddLicense(request):
             except:
                 print("existing: %s" % License.objects.get(licenseid=license))
         except:
+            e = sys.exc_info()[0]
+            msg = { "msg": "User %s tried to add MAC %s which was denied because we got error %s (%s)" % (str(user), MAC, e, e.__doc__), "user": str(user), "MAC": MAC, "exception": str(e), "doc": str(e.__doc__) }
+            logging.error(__name__ + " JSON= " + str(msg))
             return HttpResponse("Error: No MAC")
 
 def LicensesView(request):
