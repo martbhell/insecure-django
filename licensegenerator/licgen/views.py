@@ -220,3 +220,16 @@ def AddProfileDescription(request):
         return HttpResponse("OK: Description set to %s for %s" % (description, logged_in_user))
     else:
         return redirect('/')
+
+@login_required
+def ChangePassword(request):
+
+    if request.method == "POST":
+        password = request.POST.get('password', '')
+        logged_in_user = User.objects.get(username=request.user)
+        logged_in_user.set_password(password)
+        logged_in_user.save()
+        print("OK: password changed for %s" % (logged_in_user))
+        return HttpResponse("OK: password changed for %s" % (logged_in_user))
+    else:
+        return redirect('/')

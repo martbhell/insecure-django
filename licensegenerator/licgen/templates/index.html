@@ -63,6 +63,14 @@
         <input type="submit"/>
     </form>
 
+		<h2>Change Password</h2>
+
+    <form action="/pwchange" method="POST">
+        {% csrf_token %}
+        <input type="password" name="password" required/>
+        <input type="submit"/>
+    </form>
+
 
 
     </body>
