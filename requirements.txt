@@ -14,7 +14,6 @@ lazy-object-proxy
 mccabe
 mypy-extensions
 pathspec
-pkg-resources
 pylint
 pytz
 regex
@@ -27,4 +26,3 @@ toml
 typed-ast
 typing-extensions
 urllib3
-wrapt
