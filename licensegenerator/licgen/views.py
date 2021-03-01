@@ -18,8 +18,16 @@ logger = logging.getLogger(__name__)
 def index(request):
     return render(request, 'index.html', {'licenses': [ { "licenseid": "123ABC", "owner": "bob", "created_at": "2021-12-13", "expired_at": "2022-12-13"} ] } )
 
+@login_required
 def AllAccountsView(request):
     # Return a handy list of profiles for automating system administration
+    logged_in_user = User.objects.get(username=request.user)
+    logged_in_profile = Profile.objects.get(user=logged_in_user)
+    if not logged_in_profile.admin:
+        msg = { "msg": "user %s attempted to access the AllAccountsView" % (str(request.user)), "user": str(request.user), "function": "AllAccountsView" }
+        logger.warn(__name__ + " JSON= " + str(msg))
+        return redirect('/')
+
     users = User.objects.all()
     profiles = Profile.objects.all()
     pretty = request.GET.get('pretty')
@@ -181,9 +189,6 @@ def CreateUsers(request):
 @login_required
 def AddUserLicenses(request):
 
-    # TODO improve security
-    # if profile.admin
-
     if request.method == "POST":
         more_licenses = request.POST.get('more_licenses', '0')
         chosen_user = request.POST.get('chosen_user', '')
@@ -203,9 +208,6 @@ def AddUserLicenses(request):
 
 @login_required
 def AddProfileDescription(request):
-
-    # TODO improve security
-    # if profile.admin
 
     if request.method == "POST":
         description = request.POST.get('description', '')
