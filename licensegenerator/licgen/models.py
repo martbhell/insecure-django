@@ -13,6 +13,7 @@ class Profile(ExportModelOperationsMixin('profile'), models.Model):
     social_security = models.CharField(max_length=13, unique=True)
     num_licenses = models.IntegerField(default=10)
     admin = models.BooleanField(default=False)
+    description = models.TextField(default="Default")
 
 class License(ExportModelOperationsMixin('license'), models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)

@@ -33,32 +33,28 @@ def AllAccountsView(request):
             print("no profile for %s" % user)
             pass
 
-    data = []
+    datadict = {}
     for p in plist:
         ss = p.social_security
         u = str(p.user)
         a = p.admin
         n = p.num_licenses
+        d = p.description
         #print(type(ss))
         #print(type(u))
         #print(type(a))
         #print(type(n))
-        data.append({ "social_security": ss, "username": u, "admin": a, "num_licenses": n })
-
-    jsondata = json.dumps(data)
-
-    # TODO: how unsafe is safe=False ?
-    #  https://docs.djangoproject.com/en/3.1/ref/request-response/#jsonresponse-objects
-    #   If it’s set to False, any object can be passed for serialization (otherwise only dict instances are allowed)
-    #  OWASP deserialization ?
+        datadict[ss] = { "social_security": ss, "username": u, "admin": a, "num_licenses": n, "description": d }
 
     msg = { "msg": "user %s accessed the AllAccountsView" % (str(request.user)), "user": str(request.user), "function": "AllAccountsView" }
+
+    print(type(datadict))
 
     logger.warn(__name__ + " JSON= " + str(msg))
 
     if pretty or pretty == "":
-        return JsonResponse(data, safe=False, json_dumps_params={'indent': 2})
-    return JsonResponse(data, safe=False)
+        return JsonResponse(datadict, safe=True, json_dumps_params={'indent': 2})
+    return JsonResponse(datadict)
 
 
 def AdminView(request):
@@ -204,3 +200,21 @@ def AddUserLicenses(request):
             raise PermissionDenied
     else:
         return redirect('/admin')
+
+@login_required
+def AddProfileDescription(request):
+
+    # TODO improve security
+    # if profile.admin
+
+    if request.method == "POST":
+        description = request.POST.get('description', '')
+        logged_in_user = User.objects.get(username=request.user)
+        logged_in_profile = Profile.objects.get(user=logged_in_user)
+        old_description = logged_in_profile.description
+        logged_in_profile.description = description
+        logged_in_profile.save()
+        print("OK: Description set to %s for %s instead of %s" % (description, logged_in_user, old_description))
+        return HttpResponse("OK: Description set to %s for %s" % (description, logged_in_user))
+    else:
+        return redirect('/')

@@ -55,6 +55,15 @@
         <h2>Add more licenses</h2>
 		<a href="/admin">Admin</a>
 
+		<h2>Add user description</h2>
+
+    <form action="/add_profile_description" method="POST">
+        {% csrf_token %}
+        <input type="text" name="description" required/>
+        <input type="submit"/>
+    </form>
+
+
 
     </body>
 </html>
