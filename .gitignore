@@ -6,6 +6,9 @@ __pycache__
 db.sqlite3
 media
 
+# Django secret.key #
+secret.key
+
 # Backup files # 
 *.bak 
 
